@@ -81,14 +81,16 @@ export class UserService {
       throw new NotFoundException('Usuário não encontrado.');
     }
 
-    const emailExists = await this.prismaService.user.findUnique({
-      where: {
-        email: updateUserDto.email,
+    if (updateUserDto.email) {
+      const emailExists = await this.prismaService.user.findUnique({
+        where: {
+          email: updateUserDto.email,
+        }
+      });
+  
+      if(emailExists) {
+        throw new ConflictException('E-mail já cadastrado.')
       }
-    });
-
-    if(emailExists) {
-      throw new ConflictException('E-mail já cadastrado.')
     }
 
     const updatedUser = await this.prismaService.user.update({
@@ -101,6 +103,30 @@ export class UserService {
       }
     });
 
+    delete updatedUser.password
+
     return updatedUser;
+  }
+
+  async delete(userId: string) {
+    const userFinder = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      }
+    });
+
+    if (!userFinder) {
+      throw new NotFoundException('Usuário não encontrado.');
+    }
+
+    const deletedUser = await this.prismaService.user.delete({
+      where: {
+        id: userId
+      },
+    });
+
+    delete deletedUser.password;
+
+    return deletedUser
   }
 }
