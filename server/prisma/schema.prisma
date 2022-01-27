@@ -8,14 +8,29 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  firstName String
-  lastName  String
-  password  String
-  imageUrl  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String      @id @default(uuid())
+  email      String      @unique
+  firstName  String
+  lastName   String
+  password   String
+  imageUrl   String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  properties Propertie[]
 
   @@map("user")
+}
+
+model Propertie {
+  id          String   @id @default(uuid())
+  title       String
+  price       Float
+  description String
+  imageUrl    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  User        User?    @relation(fields: [userId], references: [id])
+  userId      String?
+
+  @@map("propertie")
 }
